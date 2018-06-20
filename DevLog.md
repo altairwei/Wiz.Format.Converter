@@ -8,6 +8,17 @@ objApp.CreateActiveXObject("wscript.shell")
 new ActiveXObject("Shell.Application");
 ```
 
+## 保存图片到本地
+
+### 方案1 (废弃！！！！将富文本和markdown混写是邪道！！！！)
+
+将代码注入页面，然后在页面解析。遍历所有IMG，
+
+```javascript
+var parser = new DOMParser();
+docHtml = parser.parseFromString(window.external.WizDocument.GetHtml(), "text/html");
+```
+
 ## 另存为 Markdown
 
 - [ ] 将图标到出到文件夹，重新命名图片名称
