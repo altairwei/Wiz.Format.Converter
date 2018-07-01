@@ -1,0 +1,43 @@
+{
+  "name": "wiz.format.converter",
+  "version": "1.0.0",
+  "description": "Wiznote Document Format Converter",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/altairwei/Wiz.Format.Converter.git"
+  },
+  "keywords": [
+    "wiznote"
+  ],
+  "author": "Altair Wei",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/altairwei/Wiz.Format.Converter/issues"
+  },
+  "homepage": "https://github.com/altairwei/Wiz.Format.Converter#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^0.28.11",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
+    "inline-source-map": "^0.6.2",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.14.0",
+    "webpack-cli": "^3.0.8"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "html2markdown": "^1.1.0",
+    "jquery": "^3.3.1",
+    "prettier": "^1.13.7"
+  }
+}

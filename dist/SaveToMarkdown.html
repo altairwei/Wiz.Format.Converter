@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>保存到 Markdown</title>
+    </head>
+
+    <body style="display: none">
+        <form class="form-horizontal container">
+            <div class="form-group row">
+                <div class="col-xs-12">
+                    <label for="fileName">文件名</label>
+                    <input type="text" class="form-control" id="fileName">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-xs-12" >
+                    <label for="filePath">保存到文件夹</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="filePath">
+                        <span class="input-group-btn">
+                            <button id='chooseFilePath' class='btn btn-default'><span class="glyphicon glyphicon-level-up"></span></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-xs-6">
+                    <label for="charset">字符集</label>
+                    <select class="form-control" id='charset'>
+                        <option>Unicode</option>
+                        <option>UTF-8</option>
+                        <option>UTF-8 with BOM</option>
+                        <option>GB2312</option>
+                        <option>GBK</option>
+                        <option>Big5</option>
+                    </select>                    
+                </div>
+                <div class="col-xs-6">
+                    <label for="othercharset">其他字符集</label>
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="checkbox" id="othercharset-checkbox">
+                        </span>
+                        <input type="text" id="othercharset" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-xs-12 text-right">
+                    <button type="submit" class="btn btn-default" id="exportFile">导出</button>  
+                </div>
+            </div>
+        </form>
+    <script type="text/javascript" src="SaveToMarkdown.js"></script></body>
+</html>
