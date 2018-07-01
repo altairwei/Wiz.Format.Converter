@@ -1,8 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 const html2markdown = require('html2markdown');
-const prettier = require("prettier/standalone");
-const plugins = [require("prettier/parser-markdown")];
 
 const objApp = window.external;
 const objDatabase = objApp.Database;
@@ -59,9 +57,9 @@ $(document).ready(function(){
             objCommon.DeletePathFile(fileFolder + '/index.html'); //删除不需要的html
             // 保存文档
             const html = objWindow.CurrentDocument.GetHtml()
-            const body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
+            let body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
+            body = body.replace(/&nbsp;/g, ' '); // 处理实体字符，不同编辑器之间太混乱了
             let text = html2markdown( body );
-            //text = prettier.format(text, { parser: "markdown", plugins });
             objCommon.SaveTextToFile(destFileName, text, charset);
             objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
         }
