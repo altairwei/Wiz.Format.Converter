@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
-const html2markdown = require('html2markdown');
+const html2markdown = require('./lib/html2markdown/index');
+const he = require('he');
 import { 
     WizExplorerWindow as objWindow,
     WizCommonUI as objCommon,
@@ -20,6 +21,18 @@ const ValidCharSet = {
 const DocCollection = [
     objWindow.CurrentDocument
 ]
+
+function wizImageToMarkdown(html) {
+    const imgArray = objCommon.HtmlExtractTags(html, 'img', '', '');
+    for ( imgStr of imgArray ) {
+        const title = objCommon.HtmlTagGetAttributeValue(imgStr, 'title');
+        const src = objCommon.HtmlTagGetAttributeValue(imgStr, 'src');
+        const imgMarkdown = `![${title}](${src})`;
+        const imgRegex = new RegExp(imgStr, 'g');
+        html = html.replace(imgRegex, imgMarkdown)
+    }
+    return html;
+}
 
 function startConverterOnClick(e) {
     e.preventDefault();
@@ -47,11 +60,13 @@ function convertDocToMarkdown(doc, filePath, charset) {
         const ziwFileName = doc.FileName;
         objCommon.HtmlConvertZipFileToHtmlFile(ziwFileName, fileFolder + '/index.html', fileName);
         objCommon.DeletePathFile(fileFolder + '/index.html'); //删除不需要的html
-        // 保存文档
-        const html = doc.GetHtml()
+        // 解析ziw
+        const html = doc.GetHtml();
         let body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
-        body = body.replace(/&nbsp;/g, ' '); // 处理实体字符，不同编辑器之间太混乱了
+        body = body.replace(/\s|&nbsp;/g, '\u0020'); // 将空格全部转化成半角空格
+        body = he.decode(body); // 处理其他实体字符
         let text = html2markdown( body );
+        // 导出文档
         objCommon.SaveTextToFile(destFileName, text, charset);
         objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
     }
