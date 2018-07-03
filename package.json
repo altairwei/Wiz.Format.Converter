@@ -38,6 +38,8 @@
     "bootstrap": "^3.3.7",
     "html2markdown": "^1.1.0",
     "jquery": "^3.3.1",
-    "prettier": "^1.13.7"
+    "prettier": "^1.13.7",
+    "remark": "^9.0.0",
+    "remark-stringify": "^5.0.0"
   }
 }

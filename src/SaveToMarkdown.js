@@ -1,12 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 const html2markdown = require('html2markdown');
-
-const objApp = window.external;
-const objDatabase = objApp.Database;
-const objWindow = objApp.Window;
-const objCommon = objApp.CreateWizObject("WizKMControls.WizCommonUI");
-const pluginPath = objApp.GetPluginPathByScriptFileName("sm_global.js");
+import { 
+    WizExplorerWindow as objWindow,
+    WizCommonUI as objCommon,
+    WizAlert
+} from './WizInterface'
 
 const ValidCharSet = {
     'Unicode': 'unicode', 
@@ -17,16 +16,48 @@ const ValidCharSet = {
     'Big5': 'big5'
 };
 
-function WizAlert(msg) {
-    objWindow.ShowMessage(msg, "{p}", 0x00000040);
+// 根据
+const DocCollection = [
+    objWindow.CurrentDocument
+]
+
+function startConverterOnClick(e) {
+    e.preventDefault();
+    const doc = objWindow.CurrentDocument;
+    $('#fileName').val(doc.Title);
+    const filePath = $('#filePath').val();
+    const charset = $("#othercharset-checkbox").prop('checked') ? $('#othercharset').val() : ValidCharSet[$('#charset').val()];
+    convertDocToMarkdown(doc, filePath, charset);
 }
 
-function WizConfirm(msg) {
-    return objWindow.ShowMessage(msg, "{p}", 0x00000020 | 0x00000001) == 1;
+function convertDocToMarkdown(doc, filePath, charset) {
+    const fileName = doc.Title;
+    const isMarkdown = doc.IsMarkdown();
+    if (!isMarkdown) {
+        WizAlert('该文档非Markdown');
+        return false;
+    }
+    
+    if (filePath && charset) {
+        // 创建文件夹
+        const fileFolder = filePath + fileName;
+        const destFileName = filePath + fileName + '/' + fileName;
+        objCommon.CreateDirectory(fileFolder);
+        // 保存图片
+        const ziwFileName = doc.FileName;
+        objCommon.HtmlConvertZipFileToHtmlFile(ziwFileName, fileFolder + '/index.html', fileName);
+        objCommon.DeletePathFile(fileFolder + '/index.html'); //删除不需要的html
+        // 保存文档
+        const html = doc.GetHtml()
+        let body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
+        body = body.replace(/&nbsp;/g, ' '); // 处理实体字符，不同编辑器之间太混乱了
+        let text = html2markdown( body );
+        objCommon.SaveTextToFile(destFileName, text, charset);
+        objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
+    }
 }
 
 $(document).ready(function(){
-
     $('#fileName').val(objWindow.CurrentDocument.Title);
 
     $('#chooseFilePath').on('click', function(e){
@@ -35,35 +66,7 @@ $(document).ready(function(){
         $('#filePath').val(filePath);
     })
 
-    $('#exportFile').on('click', function(e){
-        e.preventDefault();
-        const isMarkdown = objWindow.CurrentDocument.IsMarkdown();
-        if (!isMarkdown) {
-            WizAlert('该文档非Markdown');
-            return false;
-        }
-        const fileName = $('#fileName').val();
-        const filePath = $('#filePath').val();
-        const charset = $("#othercharset-checkbox").prop('checked') ? $('#othercharset').val() : ValidCharSet[$('#charset').val()];
-        
-        if (filePath && fileName && charset) {
-            // 创建文件夹
-            const fileFolder = filePath + fileName;
-            const destFileName = filePath + fileName + '/' + fileName;
-            objCommon.CreateDirectory(fileFolder);
-            // 保存图片
-            const ziwFileName = objWindow.CurrentDocument.FileName;
-            objCommon.HtmlConvertZipFileToHtmlFile(ziwFileName, fileFolder + '/index.html', fileName);
-            objCommon.DeletePathFile(fileFolder + '/index.html'); //删除不需要的html
-            // 保存文档
-            const html = objWindow.CurrentDocument.GetHtml()
-            let body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
-            body = body.replace(/&nbsp;/g, ' '); // 处理实体字符，不同编辑器之间太混乱了
-            let text = html2markdown( body );
-            objCommon.SaveTextToFile(destFileName, text, charset);
-            objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
-        }
-    });
+    $('#exportFile').on('click', startConverterOnClick);
 
     $('body').css('display', 'block');
 })
