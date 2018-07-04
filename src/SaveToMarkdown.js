@@ -63,9 +63,10 @@ function convertDocToMarkdown(doc, filePath, charset) {
         // 解析ziw
         const html = doc.GetHtml();
         let body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
-        body = body.replace(/\s|&nbsp;/g, '\u0020'); // 将空格全部转化成半角空格
-        body = he.decode(body); // 处理其他实体字符
+        body = body.replace(/\s|&nbsp;/g, '\u0020'); // 将空格统一为转化成半角空格
         let text = html2markdown( body );
+        // 后处理实体字符避免解析错误
+        text = he.decode(text); // 处理其他实体字符
         // 导出文档
         objCommon.SaveTextToFile(destFileName, text, charset);
         objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
