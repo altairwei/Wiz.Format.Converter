@@ -46,7 +46,14 @@
  * @param {String} value 要剔除的文本
  */
 function trim(value) {
-	return value.replace(/^\s+|\s+$/g,"");
+
+	if ( value == '  \n' ) {
+		// br 转换成的字符不算空白
+		return value;
+	} else {
+		return value.replace(/^\s+|\s+$/g,"");
+	}
+	
 }
 
 /**
@@ -150,7 +157,7 @@ function html2markdown(html, opts) {
 	 * @param {Array} list 要窥视的数组
 	 */
 	function peek(list) {
-		if(list && list.length > 0) {
+		if ( list && list.length > 0 ) {
 			return list.slice(-1)[0];
 		}
 		return "";
@@ -160,12 +167,12 @@ function html2markdown(html, opts) {
 	 * @param {Array} list 要窥视的数组
 	 */
 	function peekTillNotEmpty(list) {
-		if(!list) {
+		if ( !list ) {
 			return "";
 		}
 
-		for(var i = list.length - 1; i>=0; i-- ){
-			if(list[i] != "") {
+		for ( var i = list.length - 1; i>=0; i-- ) {
+			if ( list[i] != "" ) {
 				return list[i];
 			}
 		}
@@ -290,13 +297,14 @@ function html2markdown(html, opts) {
 		start: function(tag, attrs, unary) {
 			tag = tag.toLowerCase();
 
-			if(unary && (tag != "br" && tag != "hr" && tag != "img")) {
+			if ( unary && (tag != "br" && tag != "hr" && tag != "img") ) {
 				return;
 			}
 
 		switch (tag) {
 			case "br":
 				nodeList.push(markdownTags[tag]); // 添加一个换行符\n
+				//console.log([peek(nodeList)])
 				break;
 			case "hr":
 				block(); // 处理当前一块级元素，并添加相应的换行符
@@ -334,7 +342,7 @@ function html2markdown(html, opts) {
 			case "p":
 			case "div":
 			//case "td":
-				block(false, false); // 处理当前一块级元素，并添加相应的换行符
+				block(false, false); // 处理前一块级元素，并添加相应的换行符
 				break;
 			case "ul":
 			case "ol":
@@ -444,9 +452,11 @@ function html2markdown(html, opts) {
 				}
 
 				//TODO: 检验chars中是否为h1等等需要换行的元素，进行换行
+				/*
 				if ( /^#{1,7}/.test(text) ) {
-					text = '\n' + text + '\n\n'
+					text = '\n' + text + '\n'
 				}
+				*/
 			} else {
 				nodeList.push("");
 				return;
@@ -477,8 +487,8 @@ function html2markdown(html, opts) {
 			case "p":
 			case "div":
 			//case "td":
-				while(nodeList.length > 0 && trim(peek(nodeList)) == "") {
-					nodeList.pop();
+				while ( nodeList.length > 0 && trim(peek(nodeList)) == "" ) {
+						nodeList.pop();
 				}
 				block(true, false);
 				break;
@@ -656,7 +666,7 @@ function html2markdown(html, opts) {
 			}
 		}
 	}
-
+	console.log(nodeList);
 	return nodeList.join("");
 
 }

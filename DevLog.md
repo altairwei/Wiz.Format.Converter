@@ -14,6 +14,15 @@ new ActiveXObject("Shell.Application");
 
 ## 另存为 Markdown
 
-- [ ] 将图标到出到文件夹，重新命名图片名称
+- [x] 将图标到出到文件夹
 - [x] 用HtmlDialog做用户界面
 - [ ] 利用 Markdown 标准格式化自动排版
+
+## 基于WizCommonUI接口的HTML解析器
+
+利用各种HTML提取接口来实现
+
+## 已知问题
+
+- [ ] 在 Markdown 代码块中写HTML代码会造成解析错误。
+- [ ] 由于 Editor.md 插件在转换图片为Markdown语句时会保留`<img />`元素并隐藏，所以用本插件导出后图片会出现重复。
