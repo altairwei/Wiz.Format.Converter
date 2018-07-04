@@ -69,40 +69,47 @@
 
 	function HTMLParser( html, handler ) {
 		var index, chars, match, stack = [], last = html;
+		/**
+		 * 查询堆栈中最后一个元素
+		 */
 		stack.last = function(){
 			return this[ this.length - 1 ];
 		};
 
+		// 只要html还没解析完，循环一直进行
 		while ( html ) {
 			chars = true;
 
-			// Make sure we're not in a script or style element
+			// Make sure we're not in a script or style element 确保不解析脚本和样式
+			// 只有当堆栈为空时（只有第一次为空吧？）或者堆栈最后一个元素不为特殊元素时
 			if ( !stack.last() || !special[ stack.last() ] ) {
 
-				// Comment
+				// Comment 解析注释
 				if ( html.indexOf("<!--") == 0 ) {
+					// 当html截取到<!--时，计算-->位置
 					index = html.indexOf("-->");
 
 					if ( index >= 0 ) {
-						if ( handler.comment )
-							handler.comment( html.substring( 4, index ) );
-						html = html.substring( index + 3 );
+						if ( handler.comment ) handler.comment( html.substring( 4, index ) ); // 传入<!-- -->直接按的文字
+						html = html.substring( index + 3 ); // 从-->后进行截取
 						chars = false;
 					}
 
 				// end tag
 				} else if ( html.indexOf("</") == 0 ) {
-					match = html.match( endTag );
+					// 当html截取到</时，判断为结束闭合标签
+					match = html.match( endTag ); // 仅匹配一次
 
 					if ( match ) {
-						html = html.substring( match[0].length );
-						match[0].replace( endTag, parseEndTag );
+						html = html.substring( match[0].length ); // 截取剩余html
+						match[0].replace( endTag, parseEndTag ); // 用 parseEndTag 函数处理endTag
 						chars = false;
 					}
 
 				// start tag
 				} else if ( html.indexOf("<") == 0 ) {
-					match = html.match( startTag );
+					// 当截取到<时，判断为开放标签
+					match = html.match( startTag ); // 精确匹配开放标签
 
 					if ( match ) {
 						html = html.substring( match[0].length );
@@ -111,10 +118,14 @@
 					}
 				}
 
-				if ( chars ) {
-					index = html.indexOf("<");
-
+				if ( chars ) { // 当以上条件判断都失败后，该内容被当作chars处理
+					//避免将Markdown中的php代码<? ?>或者<https://>语法解析成开放标签, 这里做出了修改
+					// 寻找下一个标签位置
+					var tagRegex = /<(\w+)((?:\s+\w+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>|<\/(\w+)[^>]*>/
+					index = html.match(tagRegex).index;
+					// 如果没有标签了则剩余内容全部当作chars，否则提取到下一个标签为止。
 					var text = index < 0 ? html : html.substring( 0, index );
+					// 截取剩余html
 					html = index < 0 ? "" : html.substring( index );
 
 					if ( handler.chars )
@@ -122,7 +133,9 @@
 				}
 
 			} else {
+				// 处理script和style时
 				html = html.replace(new RegExp("(.*)<\/" + stack.last() + "[^>]*>"), function(all, text){
+					// 处理JS脚本或者CSS样式内容，直接转化为文本
 					text = text.replace(/<!--(.*?)-->/g, "$1")
 						.replace(/<!\[CDATA\[(.*?)]]>/g, "$1");
 
@@ -134,17 +147,26 @@
 
 				parseEndTag( "", stack.last() );
 			}
-
-			if ( html == last )
-				throw "Parse Error: " + html;
+			// 判断截取后的html是否等于前一次last的html
+			if ( html == last )	throw "Parse Error: " + html;
+			// 通过判定后，将hmtl赋值到前一次last
 			last = html;
 		}
 
 		// Clean up any remaining tags
 		parseEndTag();
 
+		/**
+		 * 处理匹配到的开放标签
+		 * @param {String} tag 匹配到的开放标签
+		 * @param {String} tagName 开放标签名称
+		 * @param {String} rest 各种属性
+		 * @param {String} unary 是否为空标签
+		 */
 		function parseStartTag( tag, tagName, rest, unary ) {
+			// 块级元素
 			if ( block[ tagName ] ) {
+				// 当堆栈存在元素且为行内元素时循环执行
 				while ( stack.last() && inline[ stack.last() ] ) {
 					parseEndTag( "", stack.last() );
 				}
@@ -154,14 +176,16 @@
 				parseEndTag( "", tagName );
 			}
 
+			// 判断是否为空标签
 			unary = empty[ tagName ] || !!unary;
 
-			if ( !unary )
-				stack.push( tagName );
+			// 如果不是空标签就将开放标签推入堆栈中
+			if ( !unary ) stack.push( tagName );
 
 			if ( handler.start ) {
 				var attrs = [];
-
+				
+				// 提取标签属性
 				rest.replace(attr, function(match, name) {
 					var value = arguments[2] ? arguments[2] :
 						arguments[3] ? arguments[3] :
@@ -179,27 +203,35 @@
 					handler.start( tagName, attrs, unary );
 			}
 		}
-
+		/**
+		 * 处理匹配到的闭合标签
+		 * @param {String} tag 匹配的标签
+		 * @param {String} tagName 从匹配中提取出来的标签名
+		 */
 		function parseEndTag( tag, tagName ) {
 			// If no tag name is provided, clean shop
 			if ( !tagName )
 				var pos = 0;
 
-			// Find the closest opened tag of the same type
-			else
-				for ( var pos = stack.length - 1; pos >= 0; pos-- )
+			// 在堆栈中找到最近的同类开放标签
+			else {
+
+				for ( var pos = stack.length - 1; pos >= 0; pos-- ) {
 					if ( stack[ pos ] == tagName )
 						break;
+				}
+				// 如果最近的同类开放标签存在
+				if ( pos >= 0 ) {
+					// Close all the open elements, up the stack
+					for ( var i = stack.length - 1; i >= pos; i-- )
+						if ( handler.end )
+							handler.end( stack[ i ] );
 
-			if ( pos >= 0 ) {
-				// Close all the open elements, up the stack
-				for ( var i = stack.length - 1; i >= pos; i-- )
-					if ( handler.end )
-						handler.end( stack[ i ] );
-
-				// Remove the open elements from the stack
-				stack.length = pos;
+					// Remove the open elements from the stack
+					stack.length = pos;
+				}
 			}
+
 		}
 	};
 
