@@ -46,7 +46,14 @@
  * @param {String} value 要剔除的文本
  */
 function trim(value) {
-	return value.replace(/^\s+|\s+$/g,"");
+
+	if ( value == '  \n' ) {
+		// br 转换成的字符不算空白
+		return value;
+	} else {
+		return value.replace(/^\s+|\s+$/g,"");
+	}
+	
 }
 
 /**
@@ -335,7 +342,7 @@ function html2markdown(html, opts) {
 			case "p":
 			case "div":
 			//case "td":
-				block(false, false); // 处理当前一块级元素，并添加相应的换行符
+				block(false, false); // 处理前一块级元素，并添加相应的换行符
 				break;
 			case "ul":
 			case "ol":
@@ -445,9 +452,11 @@ function html2markdown(html, opts) {
 				}
 
 				//TODO: 检验chars中是否为h1等等需要换行的元素，进行换行
+				/*
 				if ( /^#{1,7}/.test(text) ) {
 					text = '\n' + text + '\n'
 				}
+				*/
 			} else {
 				nodeList.push("");
 				return;
@@ -478,8 +487,8 @@ function html2markdown(html, opts) {
 			case "p":
 			case "div":
 			//case "td":
-				while(nodeList.length > 0 && trim(peek(nodeList)) == "") {
-					nodeList.pop();
+				while ( nodeList.length > 0 && trim(peek(nodeList)) == "" ) {
+						nodeList.pop();
 				}
 				block(true, false);
 				break;

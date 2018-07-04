@@ -68,7 +68,7 @@ function convertDocToMarkdown(doc, filePath, charset) {
         let text = html2markdown( body );
         // 导出文档
         objCommon.SaveTextToFile(destFileName, text, charset);
-        //objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
+        objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
     }
 }
 

@@ -3,6 +3,8 @@
  * Original code by Erik Arvidsson, Mozilla Public License
  * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
  *
+ * 此代码经过改动用于解析为知笔记html文档
+ * 
  * // Use like so:
  * HTMLParser(htmlString, {
  *     start: function(tag, attrs, unary) {},
@@ -166,7 +168,7 @@
 		function parseStartTag( tag, tagName, rest, unary ) {
 			// 块级元素
 			if ( block[ tagName ] ) {
-				// 当堆栈存在元素且为行内元素时循环执行
+				// 当堆栈存在元素且最后一个元素为行内元素时循环执行
 				while ( stack.last() && inline[ stack.last() ] ) {
 					parseEndTag( "", stack.last() );
 				}
@@ -199,37 +201,36 @@
 					});
 				});
 
-				if ( handler.start )
-					handler.start( tagName, attrs, unary );
+				if ( handler.start ) handler.start( tagName, attrs, unary );
 			}
 		}
 		/**
-		 * 处理匹配到的闭合标签
+		 * 当标签闭合时，处理掉标签内部的所有标签
 		 * @param {String} tag 匹配的标签
 		 * @param {String} tagName 从匹配中提取出来的标签名
 		 */
 		function parseEndTag( tag, tagName ) {
 			// If no tag name is provided, clean shop
-			if ( !tagName )
+			if ( !tagName ){
 				var pos = 0;
-
-			// 在堆栈中找到最近的同类开放标签
-			else {
-
+			} else {
+				// 在堆栈中找到最近的同类开放标签
 				for ( var pos = stack.length - 1; pos >= 0; pos-- ) {
 					if ( stack[ pos ] == tagName )
 						break;
 				}
-				// 如果最近的同类开放标签存在
-				if ( pos >= 0 ) {
-					// Close all the open elements, up the stack
-					for ( var i = stack.length - 1; i >= pos; i-- )
-						if ( handler.end )
-							handler.end( stack[ i ] );
 
-					// Remove the open elements from the stack
-					stack.length = pos;
+			}
+			// 如果最近的同类开放标签存在
+			if ( pos >= 0 ) {
+				// Close all the open elements, up the stack
+				// 将该同类开放标签内部的所有开放标签闭合掉
+				for ( var i = stack.length - 1; i >= pos; i-- ) {
+					if ( handler.end )	handler.end( stack[ i ] );
 				}
+				// Remove the open elements from the stack
+				// 将处理完的标签移出堆栈
+				stack.length = pos;
 			}
 
 		}
