@@ -44,7 +44,7 @@ function startConverterOnClick(e) {
 }
 
 function convertDocToMarkdown(doc, filePath, charset) {
-    const fileName = doc.Title;
+    const fileName = doc.Name.replace(/\.ziw$/, '');
     const isMarkdown = doc.IsMarkdown();
     if (!isMarkdown) {
         WizAlert('该文档非Markdown');
