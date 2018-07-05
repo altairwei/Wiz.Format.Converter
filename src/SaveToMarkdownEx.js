@@ -45,7 +45,6 @@ export default function convertDocToMarkdown(doc, filePath, charset) {
         text = he.decode(text); // 处理其他实体字符
         // 导出文档
         objCommon.SaveTextToFile(destFileName, text, charset);
-        objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
 
         return true;
     } else {
