@@ -32,7 +32,8 @@
     "inline-source-map": "^0.6.2",
     "style-loader": "^0.21.0",
     "webpack": "^4.14.0",
-    "webpack-cli": "^3.0.8"
+    "webpack-cli": "^3.0.8",
+    "webpack-encoding-plugin": "^0.2.1"
   },
   "dependencies": {
     "bootstrap": "^3.3.7",

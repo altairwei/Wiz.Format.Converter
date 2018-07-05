@@ -1,12 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
-const html2markdown = require('./lib/html2markdown/index');
-const he = require('he');
 import { 
+    WizExplorerApp as objApp,
     WizExplorerWindow as objWindow,
     WizCommonUI as objCommon,
-    WizAlert
-} from './WizInterface'
+} from './WizInterface';
+import convertDocToMarkdown from './SaveToMarkdownEx';
 
 const ValidCharSet = {
     'Unicode': 'unicode', 
@@ -17,65 +16,34 @@ const ValidCharSet = {
     'Big5': 'big5'
 };
 
-// 根据
-const DocCollection = [
-    objWindow.CurrentDocument
-]
-
-function wizImageToMarkdown(html) {
-    const imgArray = objCommon.HtmlExtractTags(html, 'img', '', '');
-    for ( imgStr of imgArray ) {
-        const title = objCommon.HtmlTagGetAttributeValue(imgStr, 'title');
-        const src = objCommon.HtmlTagGetAttributeValue(imgStr, 'src');
-        const imgMarkdown = `![${title}](${src})`;
-        const imgRegex = new RegExp(imgStr, 'g');
-        html = html.replace(imgRegex, imgMarkdown)
-    }
-    return html;
-}
+const DocsArray = objWindow.GetHtmlDialogParam(window.WizChromeBrowser);
+const progress = objApp.CreateWizObject("WizKMControls.WizProgressWindow");
 
 function startConverterOnClick(e) {
     e.preventDefault();
-    const doc = objWindow.CurrentDocument;
-    $('#fileName').val(doc.Title);
+    // 获取参数
     const filePath = $('#filePath').val();
     const charset = $("#othercharset-checkbox").prop('checked') ? $('#othercharset').val() : ValidCharSet[$('#charset').val()];
-    convertDocToMarkdown(doc, filePath, charset);
-}
-
-function convertDocToMarkdown(doc, filePath, charset) {
-    const fileName = doc.Name.replace(/\.ziw$/, '');
-    const isMarkdown = doc.IsMarkdown();
-    if (!isMarkdown) {
-        WizAlert('该文档非Markdown');
-        return false;
+    // 转换数组中所有文档
+    progress.Title = '另存为 Markdown';
+    progress.Max = DocsArray.length - 1;
+    progress.Show();
+    for ( let i = 0; i < DocsArray.length; i++ ) {
+        let doc = DocsArray[i];
+        progress.Pos = i;
+        progress.Text = `正在导出 "${doc.Title}" ...`;
+        convertDocToMarkdown(doc, filePath, charset);
     }
-    
-    if (filePath && charset) {
-        // 创建文件夹
-        const fileFolder = filePath + fileName;
-        const destFileName = filePath + fileName + '/' + fileName;
-        objCommon.CreateDirectory(fileFolder);
-        // 保存图片
-        const ziwFileName = doc.FileName;
-        objCommon.HtmlConvertZipFileToHtmlFile(ziwFileName, fileFolder + '/index.html', fileName);
-        objCommon.DeletePathFile(fileFolder + '/index.html'); //删除不需要的html
-        // 解析ziw
-        const html = doc.GetHtml();
-        let body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
-        body = body.replace(/\s|&nbsp;/g, '\u0020'); // 将空格统一为转化成半角空格
-        let text = html2markdown( body );
-        // 后处理实体字符避免解析错误
-        text = he.decode(text); // 处理其他实体字符
-        // 导出文档
-        objCommon.SaveTextToFile(destFileName, text, charset);
-        objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
-    }
+    progress.Text = '完成！';
+    progress.Destroy();
+    objWindow.CloseHtmlDialog(window.WizChromeBrowser, null);
 }
 
 $(document).ready(function(){
-    $('#fileName').val(objWindow.CurrentDocument.Title);
-
+    for ( let i = 0; i < DocsArray.length; i++ ) {
+        $('#fileName').append(`<option style='overflow:hidden'>${DocsArray[i].Title}</option>`);
+    }
+    
     $('#chooseFilePath').on('click', function(e){
         e.preventDefault();
         const filePath = objCommon.SelectWindowsFolder('请选择要保存到的文件夹');
