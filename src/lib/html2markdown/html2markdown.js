@@ -46,14 +46,14 @@
  * @param {String} value 要剔除的文本
  */
 function trim(value) {
-
+	
 	if ( value == '  \n' ) {
 		// br 转换成的字符不算空白
 		return value;
 	} else {
 		return value.replace(/^\s+|\s+$/g,"");
 	}
-	
+
 }
 
 /**
