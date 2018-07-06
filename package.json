@@ -42,6 +42,9 @@
     "jquery": "^3.3.1",
     "prettier": "^1.13.7",
     "remark": "^9.0.0",
-    "remark-stringify": "^5.0.0"
+    "remark-embed-images": "^1.0.0-pre.0",
+    "remark-stringify": "^5.0.0",
+    "to-vfile": "^5.0.0",
+    "vfile": "^3.0.0"
   }
 }

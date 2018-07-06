@@ -1,11 +1,11 @@
-const html2markdown = require('./lib/html2markdown/index');
-const he = require('he');
 import { 
     WizExplorerWindow as objWindow,
     WizCommonUI as objCommon,
     WizAlert,
     WizBubbleMessage
 } from './WizInterface';
+const html2markdown = require('./lib/html2markdown/index');
+const he = require('he');
 
 function wizImageToMarkdown(html) {
     const imgArray = objCommon.HtmlExtractTags(html, 'img', '', '');
@@ -19,7 +19,11 @@ function wizImageToMarkdown(html) {
     return html;
 }
 
-export default function convertDocToMarkdown(doc, filePath, charset) {
+function embedImagesToMarkdown(destFileName, text, charset) {
+    const MARKDOWN = vfile({path: destFileName, contents: text});
+}
+
+export default function convertDocToMarkdown(doc, filePath, charset, doEmbedImages) {
     const fileName = doc.Name.replace(/\.ziw$/, '');
     const isMarkdown = doc.IsMarkdown();
     if (!isMarkdown) {
@@ -45,6 +49,13 @@ export default function convertDocToMarkdown(doc, filePath, charset) {
         text = he.decode(text); // 处理其他实体字符
         // 导出文档
         objCommon.SaveTextToFile(destFileName, text, charset);
+
+        // 将图片编码成base64
+        /*
+        if ( doEmbedImages ) {
+            embedImagesToMarkdown(destFileName, text, charset);
+        }
+        */
 
         return true;
     } else {
