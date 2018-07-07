@@ -22,11 +22,11 @@ new ActiveXObject("Shell.Application");
 
 为知笔记自带导出HTML的功能具有渲染Markdown的选项，可以利用这个功能用pandoc将html转化成富文本的word
 
-## 利用Wiz.exe执行带参数的脚本
+## 基于WizTools.dll的html文本提取工具
 
-## 基于WizCommonUI接口的HTML解析器
+先用JS将表格和图片进行处理，表格encode成正文再用prettier美化，图片转换成Markdown语法(参考html2markdown))，再输出到index.html。
 
-利用各种HTML提取接口来实现
+用C++写一个将html文件正文提取出来的命令行工具，再用JS调用该工具。
 
 ## 已知问题
 

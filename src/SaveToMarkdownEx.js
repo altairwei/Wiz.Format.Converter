@@ -19,6 +19,10 @@ function wizImageToMarkdown(html) {
     return html;
 }
 
+function wizTableToMarkdown(html) {
+    //TODO: 简单表格转换成Markdown语法，复杂表格将其prettier美化后再encode
+}
+
 function embedImagesToMarkdown(destFileName, text, charset) {
     const MARKDOWN = vfile({path: destFileName, contents: text});
 }
@@ -43,9 +47,9 @@ export default function convertDocToMarkdown(doc, filePath, charset, doEmbedImag
         // 解析ziw
         const html = doc.GetHtml();
         let body = objCommon.HtmlExtractTags(html, 'body', '', '')[0];
+        let text = html2markdown(body);
+        // 最后后处理实体字符避免解析错误
         body = body.replace(/\s|&nbsp;/g, '\u0020'); // 将空格统一为转化成半角空格
-        let text = html2markdown( body ); //用WizTools.dll的导出方法试一下
-        // 后处理实体字符避免解析错误
         text = he.decode(text); // 处理其他实体字符
         // 导出文档
         objCommon.SaveTextToFile(destFileName, text, charset);
