@@ -666,7 +666,6 @@ function html2markdown(html, opts) {
 			}
 		}
 	}
-	console.log(nodeList);
 	return nodeList.join("");
 
 }

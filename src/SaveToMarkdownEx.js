@@ -22,18 +22,20 @@ function wizImageToMarkdown(html) {
 }
 
 function wizTableToMarkdown(html) {
-    //TODO: 简单表格转换成Markdown语法，复杂表格将其prettier美化后再encode
     const wizTableContainerArray = objCommon.HtmlExtractTags(html, 'div', 'class', 'wiz-table-container');
-    for (let tableContainer of wizTableContainerArray) {
-        // 美化
-        let table = objCommon.HtmlExtractTags(tableContainer, 'table', '', '')[0];
-        table = beautify_html(table, { indent_size: 2 });
-        table = '\n' + table + '\n';
-        table = he.encode(table, { 'allowUnsafeSymbols': true, 'encodeEverything': true }); // 避免被解析
-        // 替换
-        const tableRegex = new RegExp(tableContainer, 'g');
-        html = html.replace(tableRegex, table);
+    if ( wizTableContainerArray ) {
+        for (let tableContainer of wizTableContainerArray) {
+            // 美化
+            let table = objCommon.HtmlExtractTags(tableContainer, 'table', '', '')[0];
+            table = beautify_html(table, { indent_size: 2 });
+            table = '\n' + table + '\n';
+            table = he.encode(table, { 'allowUnsafeSymbols': true, 'encodeEverything': true }); // 避免被解析
+            // 替换
+            const tableRegex = new RegExp(tableContainer, 'g');
+            html = html.replace(tableRegex, table);
+        }  
     }
+    
     return html;
 }
 
@@ -64,7 +66,7 @@ export default function convertDocToMarkdown(doc, filePath, charset, doEmbedImag
         body = wizTableToMarkdown(body);
         let text = html2markdown(body);
         // 最后后处理实体字符避免解析错误
-        body = body.replace(/\s|&nbsp;/g, '\u0020'); // 将空格统一为转化成半角空格
+        text = text.replace(/&nbsp;/g, '\u0020'); // 将空格统一为转化成半角空格
         text = he.decode(text); // 处理其他实体字符
         // 导出文档
         objCommon.SaveTextToFile(destFileName, text, charset);
