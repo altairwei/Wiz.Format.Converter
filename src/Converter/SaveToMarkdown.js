@@ -3,10 +3,10 @@ import {
     WizCommonUI as objCommon,
     WizAlert,
     WizBubbleMessage
-} from './WizInterface';
-const html2markdown = require('./lib/html2markdown/index');
+} from '../WizInterface';
+const html2markdown = require('../lib/html2markdown/index');
 const he = require('he');
-const beautify_html = require('js-beautify').html
+const beautify_html = require('js-beautify').html;
 
 
 function wizImageToMarkdown(html) {

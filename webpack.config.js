@@ -6,10 +6,11 @@ const EncodingPlugin = require('webpack-encoding-plugin');
 
 module.exports = {
   entry: {
-    SaveToMarkdown: './src/SaveToMarkdown.js',
-    SaveCurDocToMarkdown: './src/SaveCurDocToMarkdown.js',
-    SaveSelectedDocToMarkdown: './src/SaveSelectedDocToMarkdown.js',
-    SaveFolderDocToMarkdown: './src/SaveFolderDocToMarkdown.js'
+    ParamsDialog: './src/ParamsDialog.js',
+    SaveCurDocToMarkdown: './src/Menus/SaveToMarkdown/SaveCurDocToMarkdown.js',
+    SaveSelectedDocToMarkdown: './src/Menus/SaveToMarkdown/SaveSelectedDocToMarkdown.js',
+    SaveFolderDocToMarkdown: './src/Menus/SaveToMarkdown/SaveFolderDocToMarkdown.js',
+    SaveCurDocToWord: './src/Menus/SaveToWord/SaveCurDocToWord.js',
   },
   output: {
     filename: '[name].js',
@@ -19,14 +20,19 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
-      title: '保存到 Markdown',
-      template: './src/SaveToMarkdown.html',
-      filename: 'SaveToMarkdown.html',
-      chunks: ['SaveToMarkdown']
+      title: '参数对话框',
+      template: './src/ParamsDialog.html',
+      filename: 'ParamsDialog.html',
+      chunks: ['ParamsDialog']
     }),
     new EncodingPlugin({
       encoding: 'utf16le',
-      include: [/SaveSelectedDocToMarkdown.js/, /SaveCurDocToMarkdown.js/, /SaveFolderDocToMarkdown/]
+      include: [
+        /SaveSelectedDocToMarkdown.js/,
+        /SaveCurDocToMarkdown.js/,
+        /SaveFolderDocToMarkdown.js/,
+        /SaveCurDocToWord.js/
+      ]
     }),
     new webpack.ProvidePlugin({
       $: "jquery",

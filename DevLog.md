@@ -20,7 +20,7 @@ new ActiveXObject("Shell.Application");
 
 ## 直接渲染Markdown
 
-为知笔记自带导出HTML的功能具有渲染Markdown的选项，可以利用这个功能用pandoc将html转化成富文本的word
+- [] 所见即所得导出为word：为知笔记自带导出HTML的功能具有渲染Markdown的选项，可以利用这个功能用pandoc将html转化成富文本的word;
 
 ## 基于WizTools.dll的html文本提取工具
 
@@ -33,7 +33,7 @@ new ActiveXObject("Shell.Application");
 - [x] 在 Markdown 代码块中写HTML代码会造成解析错误。
 - [x] 文件名中包含特殊字符未进行过滤
 - [ ] 由于 Editor.md 插件在转换图片为Markdown语句时会保留 `<img />` 元素并隐藏，所以用本插件导出后图片会出现重复。
-- [ ] 如果用Typora保存后，换行符不再是 `<br />` 而变成了 `&nbsp;` ，从而造成换行符丢失。
+- [x] 如果用Typora保存后，换行符不再是 `<br />` 而变成了 `&nbsp;` ，从而造成换行符丢失。
 
 ## 关于自定义编码问题
 

@@ -1,0 +1,1 @@
+{"main": "msword_cli.js", "out": "-win-x86-64.exe", "target":"win-x86-64", "preset":"speed", "env": "std"}
